@@ -105,16 +105,23 @@ func ExampleNest() {
 func ExampleNew() {
 	// The default logger outputs to standard out and only writes logs that are
 	// Info level or higher.
-	logger := zap.New(
-		zap.NewJSONEncoder(zap.NoTime()), // drop timestamps in tests
-	)
+	logger := zap.New(zap.NewJSONEncoder(
+		zap.NoTime(), // drop timestamps in tests
+	))
 
 	// The default logger does not print Debug logs.
 	logger.Debug("This won't be printed.")
 	logger.Info("This is an info log.")
 
+	// For more human-readable output in the console, use a TextEncoder.
+	textLogger := zap.New(zap.NewTextEncoder(
+		zap.TextNoTime(), // drop timestamps in tests.
+	))
+	textLogger.Info("This is a text log.")
+
 	// Output:
 	// {"level":"info","msg":"This is an info log."}
+	// [I] This is a text log.
 }
 
 func ExampleNew_options() {
@@ -198,4 +205,15 @@ func ExampleNewJSONEncoder() {
 		zap.MessageKey("@message"),         // customize the message key
 		zap.LevelString("@level"),          // stringify the log level
 	)
+}
+
+func ExampleNewTextEncoder() {
+	// A text encoder with the default settings.
+	zap.NewTextEncoder()
+
+	// Dropping timestamps is often useful in tests.
+	zap.NewTextEncoder(zap.TextNoTime())
+
+	// If you don't like the default timestamp formatting, choose another.
+	zap.NewTextEncoder(zap.TextTimeFormat(time.RFC822))
 }
