@@ -113,6 +113,11 @@ func ExampleNew() {
 	logger.Debug("This won't be printed.")
 	logger.Info("This is an info log.")
 
+	// Output:
+	// {"level":"info","msg":"This is an info log."}
+}
+
+func ExampleNew_TextEncoder() {
 	// For more human-readable output in the console, use a TextEncoder.
 	textLogger := zap.New(zap.NewTextEncoder(
 		zap.TextNoTime(), // drop timestamps in tests.
@@ -120,7 +125,6 @@ func ExampleNew() {
 	textLogger.Info("This is a text log.")
 
 	// Output:
-	// {"level":"info","msg":"This is an info log."}
 	// [I] This is a text log.
 }
 
