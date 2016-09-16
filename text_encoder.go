@@ -203,7 +203,7 @@ func (enc *textEncoder) addTime(final *textEncoder, t time.Time) {
 		return
 	}
 	final.bytes = append(final.bytes, ' ')
-	final.bytes = append(final.bytes, t.Format(enc.timeFmt)...)
+	final.bytes = t.AppendFormat(final.bytes, enc.timeFmt)
 }
 
 func (enc *textEncoder) addMessage(final *textEncoder, msg string) {
