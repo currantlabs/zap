@@ -42,7 +42,7 @@ type Encoder interface {
 	// Return the encoder to the appropriate sync.Pool. Unpooled encoder
 	// implementations can no-op this method.
 	Free()
-	// Write the supplied message, level, and timestamp to the writer, along with
+	// Write the supplied name, message, level, and timestamp to the writer, along with
 	// any accumulated context.
-	WriteEntry(io.Writer, string, Level, time.Time) error
+	WriteEntry(io.Writer, string, string, Level, time.Time) error
 }

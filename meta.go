@@ -33,6 +33,7 @@ import (
 // use, the remaining fields are not.
 type Meta struct {
 	Development bool
+	Name        string
 	Encoder     Encoder
 	Hooks       []Hook
 	Output      WriteSyncer

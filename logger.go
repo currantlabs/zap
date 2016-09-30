@@ -88,6 +88,14 @@ func (log *logger) With(fields ...Field) Logger {
 	return clone
 }
 
+func (log *logger) Named(name string) Logger {
+	clone := &logger{
+		Meta: log.Meta.Clone(),
+	}
+	clone.Name = name
+	return clone
+}
+
 func (log *logger) Check(lvl Level, msg string) *CheckedMessage {
 	switch lvl {
 	case PanicLevel, FatalLevel:
@@ -155,14 +163,14 @@ func (log *logger) log(lvl Level, msg string, fields []Field) {
 	temp := log.Encoder.Clone()
 	addFields(temp, fields)
 
-	entry := newEntry(lvl, msg, temp)
+	entry := newEntry(lvl, log.Name, msg, temp)
 	for _, hook := range log.Hooks {
 		if err := hook(entry); err != nil {
 			log.internalError(err.Error())
 		}
 	}
 
-	if err := temp.WriteEntry(log.Output, entry.Message, entry.Level, entry.Time); err != nil {
+	if err := temp.WriteEntry(log.Output, log.Name, entry.Message, entry.Level, entry.Time); err != nil {
 		log.internalError(err.Error())
 	}
 	temp.Free()

@@ -43,6 +43,21 @@ func MessageKey(key string) MessageFormatter {
 	})
 }
 
+// A NameFormatter defines how to convert a logger name into a Field.
+// NameFormatters implement the JSONOption interface.
+type NameFormatter func(string) Field
+
+func (nf NameFormatter) apply(enc *jsonEncoder) {
+	enc.nameF = nf
+}
+
+// NameKey encodes logger names under the provided key.
+func NameKey(key string) NameFormatter {
+	return NameFormatter(func(name string) Field {
+		return String(key, name)
+	})
+}
+
 // A TimeFormatter defines how to convert the time of a log entry into a Field.
 // TimeFormatters implement the JSONOption interface.
 type TimeFormatter func(time.Time) Field

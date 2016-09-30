@@ -39,13 +39,15 @@ var (
 type Entry struct {
 	Level   Level
 	Time    time.Time
+	Name    string
 	Message string
 	enc     Encoder
 }
 
-func newEntry(lvl Level, msg string, enc Encoder) *Entry {
+func newEntry(lvl Level, name string, msg string, enc Encoder) *Entry {
 	e := _entryPool.Get().(*Entry)
 	e.Level = lvl
+	e.Name = name
 	e.Message = msg
 	e.Time = _timeNow().UTC()
 	e.enc = enc

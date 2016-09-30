@@ -44,6 +44,7 @@ var (
 	errNilSink = errors.New("can't write encoded message a nil WriteSyncer")
 
 	// Default formatters for JSON encoders.
+	defaultNameF    = NameKey("name")
 	defaultMessageF = MessageKey("msg")
 	defaultTimeF    = EpochFormatter("ts")
 	defaultLevelF   = LevelString("level")
@@ -59,6 +60,7 @@ var (
 // jsonEncoder is an Encoder implementation that writes JSON.
 type jsonEncoder struct {
 	bytes    []byte
+	nameF    NameFormatter
 	messageF MessageFormatter
 	timeF    TimeFormatter
 	levelF   LevelFormatter
@@ -81,6 +83,7 @@ func NewJSONEncoder(options ...JSONOption) Encoder {
 	enc := jsonPool.Get().(*jsonEncoder)
 	enc.truncate()
 
+	enc.nameF = defaultNameF
 	enc.messageF = defaultMessageF
 	enc.timeF = defaultTimeF
 	enc.levelF = defaultLevelF
@@ -184,6 +187,7 @@ func (enc *jsonEncoder) Clone() Encoder {
 	clone := jsonPool.Get().(*jsonEncoder)
 	clone.truncate()
 	clone.bytes = append(clone.bytes, enc.bytes...)
+	clone.nameF = enc.nameF
 	clone.messageF = enc.messageF
 	clone.timeF = enc.timeF
 	clone.levelF = enc.levelF
@@ -194,7 +198,7 @@ func (enc *jsonEncoder) Clone() Encoder {
 // the encoder's accumulated fields. It doesn't modify or lock the encoder's
 // underlying byte slice. It's safe to call from multiple goroutines, but it's
 // not safe to call WriteEntry while adding fields.
-func (enc *jsonEncoder) WriteEntry(sink io.Writer, msg string, lvl Level, t time.Time) error {
+func (enc *jsonEncoder) WriteEntry(sink io.Writer, name string, msg string, lvl Level, t time.Time) error {
 	if sink == nil {
 		return errNilSink
 	}
@@ -204,6 +208,9 @@ func (enc *jsonEncoder) WriteEntry(sink io.Writer, msg string, lvl Level, t time
 	final.bytes = append(final.bytes, '{')
 	enc.levelF(lvl).AddTo(final)
 	enc.timeF(t).AddTo(final)
+	if name != "" {
+		enc.nameF(name).AddTo(final)
+	}
 	enc.messageF(msg).AddTo(final)
 	if len(enc.bytes) > 0 {
 		if len(final.bytes) > 1 {

@@ -55,7 +55,7 @@ func (nullEncoder) Clone() Encoder {
 
 // WriteEntry writes nothing to the supplied writer, but demands a valid writer.
 // It's safe to call from multiple goroutines.
-func (nullEncoder) WriteEntry(sink io.Writer, _ string, _ Level, _ time.Time) error {
+func (nullEncoder) WriteEntry(sink io.Writer, _ string, _ string, _ Level, _ time.Time) error {
 	if sink == nil {
 		return errNilSink
 	}

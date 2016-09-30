@@ -96,7 +96,7 @@ func TestTextEncoderFields(t *testing.T) {
 }
 
 func TestTextWriteEntry(t *testing.T) {
-	entry := &Entry{Level: InfoLevel, Message: "Something happened.", Time: epoch}
+	entry := &Entry{Level: InfoLevel, Name: "Some logger", Message: "Something happened.", Time: epoch}
 	tests := []struct {
 		enc      Encoder
 		expected string
@@ -104,22 +104,22 @@ func TestTextWriteEntry(t *testing.T) {
 	}{
 		{
 			enc:      NewTextEncoder(),
-			expected: "[I] 1970-01-01T00:00:00Z Something happened.",
+			expected: "[I] 1970-01-01T00:00:00Z Some logger Something happened.",
 			name:     "RFC822",
 		},
 		{
 			enc:      NewTextEncoder(TextTimeFormat(time.RFC822)),
-			expected: "[I] 01 Jan 70 00:00 UTC Something happened.",
+			expected: "[I] 01 Jan 70 00:00 UTC Some logger Something happened.",
 			name:     "RFC822",
 		},
 		{
 			enc:      NewTextEncoder(TextTimeFormat("")),
-			expected: "[I] Something happened.",
+			expected: "[I] Some logger Something happened.",
 			name:     "empty layout",
 		},
 		{
 			enc:      NewTextEncoder(TextNoTime()),
-			expected: "[I] Something happened.",
+			expected: "[I] Some logger Something happened.",
 			name:     "NoTime",
 		},
 	}
@@ -128,7 +128,7 @@ func TestTextWriteEntry(t *testing.T) {
 	for _, tt := range tests {
 		assert.NoError(
 			t,
-			tt.enc.WriteEntry(sink, entry.Message, entry.Level, entry.Time),
+			tt.enc.WriteEntry(sink, entry.Name, entry.Message, entry.Level, entry.Time),
 			"Unexpected failure writing entry with text time formatter %s.", tt.name,
 		)
 		assert.Equal(t, tt.expected, sink.Stripped(), "Unexpected output from text time formatter %s.", tt.name)
@@ -155,10 +155,10 @@ func TestTextWriteEntryLevels(t *testing.T) {
 	for _, tt := range tests {
 		assert.NoError(
 			t,
-			enc.WriteEntry(sink, "Fake message.", tt.level, epoch),
+			enc.WriteEntry(sink, "Fake name", "Fake message.", tt.level, epoch),
 			"Unexpected failure writing entry with level %s.", tt.level,
 		)
-		expected := fmt.Sprintf("[%s] Fake message.", tt.expected)
+		expected := fmt.Sprintf("[%s] Fake name Fake message.", tt.expected)
 		assert.Equal(t, expected, sink.Stripped(), "Unexpected text output for level %s.", tt.level)
 		sink.Reset()
 	}
@@ -187,7 +187,7 @@ func TestTextWriteEntryFailure(t *testing.T) {
 			{spywrite.ShortWriter{}, "Expected an error on partial writes to sink."},
 		}
 		for _, tt := range tests {
-			err := enc.WriteEntry(tt.sink, "hello", InfoLevel, time.Unix(0, 0))
+			err := enc.WriteEntry(tt.sink, "hello", "hello", InfoLevel, time.Unix(0, 0))
 			assert.Error(t, err, tt.msg)
 		}
 	})
@@ -201,7 +201,7 @@ func TestTextTimeOptions(t *testing.T) {
 
 	sink := &testBuffer{}
 	enc.AddString("foo", "bar")
-	err := enc.WriteEntry(sink, entry.Message, entry.Level, entry.Time)
+	err := enc.WriteEntry(sink, entry.Name, entry.Message, entry.Level, entry.Time)
 	assert.NoError(t, err, "WriteEntry returned an unexpected error.")
 	assert.Equal(
 		t,

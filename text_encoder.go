@@ -38,6 +38,7 @@ var textPool = sync.Pool{New: func() interface{} {
 type textEncoder struct {
 	bytes   []byte
 	timeFmt string
+	noName  bool
 }
 
 // NewTextEncoder creates a line-oriented text encoder whose output is optimized
@@ -135,7 +136,7 @@ func (enc *textEncoder) Clone() Encoder {
 	return clone
 }
 
-func (enc *textEncoder) WriteEntry(sink io.Writer, msg string, lvl Level, t time.Time) error {
+func (enc *textEncoder) WriteEntry(sink io.Writer, name string, msg string, lvl Level, t time.Time) error {
 	if sink == nil {
 		return errNilSink
 	}
@@ -144,6 +145,7 @@ func (enc *textEncoder) WriteEntry(sink io.Writer, msg string, lvl Level, t time
 	final.truncate()
 	enc.addLevel(final, lvl)
 	enc.addTime(final, t)
+	enc.addName(final, name)
 	enc.addMessage(final, msg)
 
 	if len(enc.bytes) > 0 {
@@ -206,6 +208,14 @@ func (enc *textEncoder) addTime(final *textEncoder, t time.Time) {
 	final.bytes = t.AppendFormat(final.bytes, enc.timeFmt)
 }
 
+func (enc *textEncoder) addName(final *textEncoder, name string) {
+	if name == "" || enc.noName {
+		return
+	}
+	final.bytes = append(final.bytes, ' ')
+	final.bytes = append(final.bytes, name...)
+}
+
 func (enc *textEncoder) addMessage(final *textEncoder, msg string) {
 	final.bytes = append(final.bytes, ' ')
 	final.bytes = append(final.bytes, msg...)
@@ -233,4 +243,11 @@ func TextTimeFormat(layout string) TextOption {
 // TextNoTime omits timestamps from the serialized log entries.
 func TextNoTime() TextOption {
 	return TextTimeFormat("")
+}
+
+// TextNoName suppresses the output of logger names.
+func TextNoName() TextOption {
+	return textOptionFunc(func(enc *textEncoder) {
+		enc.noName = true
+	})
 }

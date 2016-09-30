@@ -51,7 +51,7 @@ func BenchmarkZapNull(b *testing.B) {
 			enc.AddString("string3", "🤔")
 			enc.AddString("string4", "🙊")
 			enc.AddBool("bool", true)
-			enc.WriteEntry(ioutil.Discard, "fake", DebugLevel, ts)
+			enc.WriteEntry(ioutil.Discard, "fake", "fake", DebugLevel, ts)
 			enc.Free()
 		}
 	})

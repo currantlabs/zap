@@ -26,6 +26,23 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestNameFormatters(t *testing.T) {
+	const name = "foo"
+
+	tests := []struct {
+		name      string
+		formatter NameFormatter
+		expected  Field
+	}{
+		{"NameKey", NameKey("the-name"), String("the-name", name)},
+		{"Default", defaultNameF, String("name", name)},
+	}
+
+	for _, tt := range tests {
+		assert.Equal(t, tt.expected, tt.formatter(name), "Unexpected output from NameFormatter %s.", tt.name)
+	}
+}
+
 func TestMessageFormatters(t *testing.T) {
 	const msg = "foo"
 
