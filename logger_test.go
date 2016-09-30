@@ -146,6 +146,16 @@ func TestJSONLoggerWith(t *testing.T) {
 	})
 }
 
+func TestJSONLoggerNamed(t *testing.T) {
+
+	withJSONLogger(t, nil, func(logger Logger, buf *testBuffer) {
+		logger = logger.Named("foo")
+		logger.Log(DebugLevel, "bar")
+		assert.Equal(t, `{"level":"debug","name":"foo","msg":"bar"}`, buf.Stripped(), "Unexpected output from named logger.")
+	})
+
+}
+
 func TestJSONLoggerLog(t *testing.T) {
 	withJSONLogger(t, nil, func(logger Logger, buf *testBuffer) {
 		logger.Log(DebugLevel, "foo")

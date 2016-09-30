@@ -122,6 +122,11 @@ func TestTextWriteEntry(t *testing.T) {
 			expected: "[I] Some logger Something happened.",
 			name:     "NoTime",
 		},
+		{
+			enc:      NewTextEncoder(TextNoName()),
+			expected: "[I] 1970-01-01T00:00:00Z Something happened.",
+			name:     "NoName",
+		},
 	}
 
 	sink := &testBuffer{}

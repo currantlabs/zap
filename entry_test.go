@@ -37,6 +37,7 @@ func stubNow(afterEpoch time.Duration) func() {
 func TestNewEntry(t *testing.T) {
 	defer stubNow(0)()
 	e := newEntry(DebugLevel, "hello", "hello", nil)
+	assert.Equal(t, "hello", e.Name, "Unexpected name.")
 	assert.Equal(t, DebugLevel, e.Level, "Unexpected log level.")
 	assert.Equal(t, time.Unix(0, 0).UTC(), e.Time, "Unexpected time.")
 	assert.Nil(t, e.Fields(), "Unexpected fields.")

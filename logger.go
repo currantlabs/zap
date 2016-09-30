@@ -41,6 +41,9 @@ type Logger interface {
 	// Create a child logger, and optionally add some context to that logger.
 	With(...Field) Logger
 
+	// Create a child logger with a specified name.
+	Named(string) Logger
+
 	// Check returns a CheckedMessage if logging a message at the specified level
 	// is enabled. It's a completely optional optimization; in high-performance
 	// applications, Check can help avoid allocating a slice to hold fields.
@@ -92,7 +95,7 @@ func (log *logger) Named(name string) Logger {
 	clone := &logger{
 		Meta: log.Meta.Clone(),
 	}
-	clone.Name = name
+	Named(name).apply(&clone.Meta)
 	return clone
 }
 
