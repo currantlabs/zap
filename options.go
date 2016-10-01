@@ -70,7 +70,7 @@ func Development() Option {
 	})
 }
 
-// This allows setting the logger's name as an option.
+// Named sets the logger's name.
 func Named(name string) Option {
 	return optionFunc(func(m *Meta) {
 		m.Name = name
