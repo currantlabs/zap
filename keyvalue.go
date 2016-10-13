@@ -27,6 +27,9 @@ package zap
 // See Marshaler for an example.
 type KeyValue interface {
 	AddBool(key string, value bool)
+	AddByte(key string, value byte)
+	AddBytes(key string, value []byte)
+	AddFloat32(key string, value float32)
 	AddFloat64(key string, value float64)
 	AddInt(key string, value int)
 	AddInt64(key string, value int64)

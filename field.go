@@ -32,10 +32,17 @@ type fieldType int
 const (
 	unknownType fieldType = iota
 	boolType
-	floatType
+	byteType
+	bytesType
+	float32Type
+	float64Type
 	intType
+	int16Type
+	int32Type
 	int64Type
 	uintType
+	uint16Type
+	uint32Type
 	uint64Type
 	stringType
 	marshalerType
@@ -78,16 +85,47 @@ func Bool(key string, val bool) Field {
 	return Field{key: key, fieldType: boolType, ival: ival}
 }
 
+// Byte constructs a Field with the given key and value. Bytes are marshaled
+// lazily.
+func Byte(key string, val byte) Field {
+	return Field{key: key, fieldType: byteType, ival: int64(val)}
+}
+
+// Bytes constructs a Field with the given key and value. Bytes are marshaled
+// lazily.
+func Bytes(key string, val []byte) Field {
+	return Field{key: key, fieldType: bytesType, obj: val}
+}
+
+// Float32 constructs a Field with the given key and value. The way the
+// floating-point value is represented is encoder-dependent, so marshaling is
+// necessarily lazy.
+func Float32(key string, val float32) Field {
+	return Field{key: key, fieldType: float32Type, ival: int64(math.Float32bits(val))}
+}
+
 // Float64 constructs a Field with the given key and value. The way the
 // floating-point value is represented is encoder-dependent, so marshaling is
 // necessarily lazy.
 func Float64(key string, val float64) Field {
-	return Field{key: key, fieldType: floatType, ival: int64(math.Float64bits(val))}
+	return Field{key: key, fieldType: float64Type, ival: int64(math.Float64bits(val))}
 }
 
 // Int constructs a Field with the given key and value. Marshaling ints is lazy.
 func Int(key string, val int) Field {
 	return Field{key: key, fieldType: intType, ival: int64(val)}
+}
+
+// Int16 constructs a Field with the given key and value. Like ints, int16s are
+// marshaled lazily.
+func Int16(key string, val int16) Field {
+	return Field{key: key, fieldType: int16Type, ival: int64(val)}
+}
+
+// Int32 constructs a Field with the given key and value. Like ints, int32s are
+// marshaled lazily.
+func Int32(key string, val int32) Field {
+	return Field{key: key, fieldType: int32Type, ival: int64(val)}
 }
 
 // Int64 constructs a Field with the given key and value. Like ints, int64s are
@@ -99,6 +137,16 @@ func Int64(key string, val int64) Field {
 // Uint constructs a Field with the given key and value.
 func Uint(key string, val uint) Field {
 	return Field{key: key, fieldType: uintType, ival: int64(val)}
+}
+
+// Uint16 constructs a Field with the given key and value.
+func Uint16(key string, val uint16) Field {
+	return Field{key: key, fieldType: uint16Type, ival: int64(val)}
+}
+
+// Uint32 constructs a Field with the given key and value.
+func Uint32(key string, val uint32) Field {
+	return Field{key: key, fieldType: uint32Type, ival: int64(val)}
 }
 
 // Uint64 constructs a Field with the given key and value.
@@ -190,15 +238,21 @@ func (f Field) AddTo(kv KeyValue) {
 	switch f.fieldType {
 	case boolType:
 		kv.AddBool(f.key, f.ival == 1)
-	case floatType:
+	case byteType:
+		kv.AddByte(f.key, byte(f.ival))
+	case bytesType:
+		kv.AddBytes(f.key, f.obj.([]byte))
+	case float32Type:
+		kv.AddFloat32(f.key, math.Float32frombits(uint32(f.ival)))
+	case float64Type:
 		kv.AddFloat64(f.key, math.Float64frombits(uint64(f.ival)))
 	case intType:
 		kv.AddInt(f.key, int(f.ival))
-	case int64Type:
+	case int16Type, int32Type, int64Type:
 		kv.AddInt64(f.key, f.ival)
 	case uintType:
 		kv.AddUint(f.key, uint(f.ival))
-	case uint64Type:
+	case uint16Type, uint32Type, uint64Type:
 		kv.AddUint64(f.key, uint64(f.ival))
 	case stringType:
 		kv.AddString(f.key, f.str)

@@ -71,6 +71,18 @@ func (enc *textEncoder) AddBool(key string, val bool) {
 	enc.bytes = append(enc.bytes, "false"...)
 }
 
+func (enc *textEncoder) AddByte(key string, val byte) {
+	enc.addKey(key)
+	enc.bytes = append(enc.bytes, "0x"...)
+	enc.bytes = append(enc.bytes, hextable[val>>4])
+	enc.bytes = append(enc.bytes, hextable[val&0x0F])
+}
+
+func (enc *textEncoder) AddBytes(key string, val []byte) {
+	enc.addKey(key)
+	enc.bytes = hexEncode(enc.bytes, val)
+}
+
 func (enc *textEncoder) AddInt(key string, val int) {
 	enc.AddInt64(key, int64(val))
 }
@@ -81,8 +93,7 @@ func (enc *textEncoder) AddInt64(key string, val int64) {
 }
 
 func (enc *textEncoder) AddUint(key string, val uint) {
-	enc.addKey(key)
-	enc.bytes = strconv.AppendUint(enc.bytes, uint64(val), 10)
+	enc.AddUint64(key, uint64(val))
 }
 
 func (enc *textEncoder) AddUint64(key string, val uint64) {
@@ -90,17 +101,15 @@ func (enc *textEncoder) AddUint64(key string, val uint64) {
 	enc.bytes = strconv.AppendUint(enc.bytes, val, 10)
 }
 
-// TODO: uncomment once #116 lands.
-// func (enc *textEncoder) AddUint(key string, val uint) {
-// 	enc.AddUint64(key, uint64(val))
-// }
-
-// func (enc *textEncoder) AddUint64(key string, val uint64) {
-// 	enc.addKey(key)
-// 	enc.bytes = strconv.AppendUint(enc.bytes, val, 10)
-// }
+func (enc *textEncoder) AddFloat32(key string, val float32) {
+	enc.addFloat(key, float64(val), 32)
+}
 
 func (enc *textEncoder) AddFloat64(key string, val float64) {
+	enc.addFloat(key, val, 64)
+}
+
+func (enc *textEncoder) addFloat(key string, val float64, bitSize int) {
 	enc.addKey(key)
 	switch {
 	case math.IsNaN(val):
@@ -110,7 +119,7 @@ func (enc *textEncoder) AddFloat64(key string, val float64) {
 	case math.IsInf(val, -1):
 		enc.bytes = append(enc.bytes, "-Inf"...)
 	default:
-		enc.bytes = strconv.AppendFloat(enc.bytes, val, 'f', -1, 64)
+		enc.bytes = strconv.AppendFloat(enc.bytes, val, 'f', -1, bitSize)
 	}
 }
 
