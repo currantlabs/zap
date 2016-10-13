@@ -118,6 +118,21 @@ func (enc *jsonEncoder) AddBool(key string, val bool) {
 	enc.bytes = append(enc.bytes, "false"...)
 }
 
+func (enc *jsonEncoder) AddByte(key string, val byte) {
+	enc.addKey(key)
+	enc.bytes = append(enc.bytes, `"0x`...)
+	enc.bytes = append(enc.bytes, hextable[val>>4])
+	enc.bytes = append(enc.bytes, hextable[val&0x0F])
+	enc.bytes = append(enc.bytes, '"')
+}
+
+func (enc *jsonEncoder) AddBytes(key string, val []byte) {
+	enc.addKey(key)
+	enc.bytes = append(enc.bytes, '"')
+	enc.bytes = hexEncode(enc.bytes, val)
+	enc.bytes = append(enc.bytes, '"')
+}
+
 // AddInt adds a string key and integer value to the encoder's fields. The key
 // is JSON-escaped.
 func (enc *jsonEncoder) AddInt(key string, val int) {
@@ -144,11 +159,23 @@ func (enc *jsonEncoder) AddUint64(key string, val uint64) {
 	enc.bytes = strconv.AppendUint(enc.bytes, val, 10)
 }
 
+// AddFloat32 adds a string key and float32 value to the encoder's fields. The
+// key is JSON-escaped, and the floating-point value is encoded using
+// strconv.FormatFloat's 'f' option (always use grade-school notation, even for
+// large exponents).
+func (enc *jsonEncoder) AddFloat32(key string, val float32) {
+	enc.addFloat(key, float64(val), 32)
+}
+
 // AddFloat64 adds a string key and float64 value to the encoder's fields. The
 // key is JSON-escaped, and the floating-point value is encoded using
 // strconv.FormatFloat's 'f' option (always use grade-school notation, even for
 // large exponents).
 func (enc *jsonEncoder) AddFloat64(key string, val float64) {
+	enc.addFloat(key, val, 64)
+}
+
+func (enc *jsonEncoder) addFloat(key string, val float64, bitSize int) {
 	enc.addKey(key)
 	switch {
 	case math.IsNaN(val):
@@ -158,7 +185,7 @@ func (enc *jsonEncoder) AddFloat64(key string, val float64) {
 	case math.IsInf(val, -1):
 		enc.bytes = append(enc.bytes, `"-Inf"`...)
 	default:
-		enc.bytes = strconv.AppendFloat(enc.bytes, val, 'f', -1, 64)
+		enc.bytes = strconv.AppendFloat(enc.bytes, val, 'f', -1, bitSize)
 	}
 }
 

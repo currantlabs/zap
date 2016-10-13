@@ -39,10 +39,13 @@ func (nullEncoder) Free() {}
 
 func (nullEncoder) AddString(_, _ string)          {}
 func (nullEncoder) AddBool(_ string, _ bool)       {}
+func (nullEncoder) AddByte(_ string, _ byte)       {}
+func (nullEncoder) AddBytes(_ string, _ []byte)    {}
 func (nullEncoder) AddInt(_ string, _ int)         {}
 func (nullEncoder) AddInt64(_ string, _ int64)     {}
 func (nullEncoder) AddUint(_ string, _ uint)       {}
 func (nullEncoder) AddUint64(_ string, _ uint64)   {}
+func (nullEncoder) AddFloat32(_ string, _ float32) {}
 func (nullEncoder) AddFloat64(_ string, _ float64) {}
 
 func (nullEncoder) AddMarshaler(_ string, _ LogMarshaler) error { return nil }

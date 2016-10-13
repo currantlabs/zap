@@ -101,6 +101,21 @@ func TestUnlikeBoolField(t *testing.T) {
 	assertNotEqualFieldJSON(t, `"bar":false`, Bool("bar", true))
 }
 
+func TestByteField(t *testing.T) {
+	assertFieldJSON(t, `"bar":"0x2A"`, Byte("bar", 0x2A))
+	assertCanBeReused(t, Byte("bar", 0x2A))
+}
+
+func TestBytesField(t *testing.T) {
+	assertFieldJSON(t, `"bar":"0xDEADBEEF"`, Bytes("bar", []byte{0xDE, 0xAD, 0xBE, 0xEF}))
+	assertCanBeReused(t, Bytes("bar", []byte{0xDE, 0xAD, 0xBE, 0xEF}))
+}
+
+func TestFloat32Field(t *testing.T) {
+	assertFieldJSON(t, `"foo":1.314`, Float32("foo", 1.314))
+	assertCanBeReused(t, Float32("foo", 1.314))
+}
+
 func TestFloat64Field(t *testing.T) {
 	assertFieldJSON(t, `"foo":1.314`, Float64("foo", 1.314))
 	assertCanBeReused(t, Float64("foo", 1.314))
@@ -111,6 +126,16 @@ func TestIntField(t *testing.T) {
 	assertCanBeReused(t, Int("foo", 1))
 }
 
+func TestInt16Field(t *testing.T) {
+	assertFieldJSON(t, `"foo":1`, Int16("foo", int16(1)))
+	assertCanBeReused(t, Int16("foo", int16(1)))
+}
+
+func TestInt32Field(t *testing.T) {
+	assertFieldJSON(t, `"foo":1`, Int32("foo", int32(1)))
+	assertCanBeReused(t, Int32("foo", int32(1)))
+}
+
 func TestInt64Field(t *testing.T) {
 	assertFieldJSON(t, `"foo":1`, Int64("foo", int64(1)))
 	assertCanBeReused(t, Int64("foo", int64(1)))
@@ -119,6 +144,16 @@ func TestInt64Field(t *testing.T) {
 func TestUintField(t *testing.T) {
 	assertFieldJSON(t, `"foo":1`, Uint("foo", 1))
 	assertCanBeReused(t, Uint("foo", 1))
+}
+
+func TestUint16Field(t *testing.T) {
+	assertFieldJSON(t, `"foo":1`, Uint16("foo", uint16(1)))
+	assertCanBeReused(t, Uint16("foo", uint16(1)))
+}
+
+func TestUint32Field(t *testing.T) {
+	assertFieldJSON(t, `"foo":1`, Uint32("foo", uint32(1)))
+	assertCanBeReused(t, Uint32("foo", uint32(1)))
 }
 
 func TestUint64Field(t *testing.T) {

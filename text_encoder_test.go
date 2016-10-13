@@ -65,6 +65,8 @@ func TestTextEncoderFields(t *testing.T) {
 		{"string", "k=", func(e Encoder) { e.AddString("k", "") }},
 		{"bool", "k=true", func(e Encoder) { e.AddBool("k", true) }},
 		{"bool", "k=false", func(e Encoder) { e.AddBool("k", false) }},
+		{"byte", "k=0x2A", func(e Encoder) { e.AddByte("k", 0x2a) }},
+		{"bytes", "k=0xDEADBEEF", func(e Encoder) { e.AddBytes("k", []byte{0xde, 0xad, 0xbe, 0xef}) }},
 		{"int", "k=42", func(e Encoder) { e.AddInt("k", 42) }},
 		{"int64", "k=42", func(e Encoder) { e.AddInt64("k", 42) }},
 		{"int64", fmt.Sprintf("k=%d", math.MaxInt64), func(e Encoder) { e.AddInt64("k", math.MaxInt64) }},
